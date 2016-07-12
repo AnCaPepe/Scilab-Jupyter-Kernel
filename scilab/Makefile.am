@@ -33,10 +33,15 @@ AM_LDFLAGS  = $(SCI_LDFLAGS)
 bin_PROGRAMS		= scilab-bin scilab-cli-bin
 
 bin_SCRIPTS			= bin/scilab bin/scilab-adv-cli bin/scilab-cli \
-bin/scinotes bin/xcos
+bin/scinotes bin/xcos 
 
 if IS_MACOSX
 bin_SCRIPTS 		+= bin/checkmacosx.applescript
+endif
+
+if JUPYTER
+bin_PROGRAMS 		+= jupyter-scilab-kernel-bin
+bin_SCRIPTS 		+= bin/jupyter-scilab-kernel
 endif
 
 scilab_bin_LDFLAGS      = $(AM_LDFLAGS) $(OPENMPI_LIBS)
@@ -150,6 +155,13 @@ endif
 if IS_SOLARIS
 # The binary itself needs this dep
 	scilab_bin_LDADD += $(BLAS_LIBS)
+endif
+
+if JUPYTER
+scilab_cli_bin_LDADD += $(top_builddir)/modules/jupyter/libscijupyter.la $(JUPYTER_LIBS)
+jupyter_scilab_kernel_bin_SOURCES = modules/startup/src/cpp/jupyter_scilab_kernel.cpp
+jupyter_scilab_kernel_bin_CPPFLAGS = $(scilab_cli_bin_CPPFLAGS) -I$(top_srcdir)/modules/jupyter/includes/
+jupyter_scilab_kernel_bin_LDADD = $(scilab_cli_bin_LDADD)
 endif
 
 LANG_DOMAIN=scilab

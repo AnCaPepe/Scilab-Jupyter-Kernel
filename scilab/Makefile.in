@@ -119,37 +119,41 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = scilab-bin$(EXEEXT) scilab-cli-bin$(EXEEXT)
+bin_PROGRAMS = scilab-bin$(EXEEXT) scilab-cli-bin$(EXEEXT) \
+	$(am__EXEEXT_1)
 @IS_MACOSX_TRUE@am__append_1 = bin/checkmacosx.applescript
+@JUPYTER_TRUE@am__append_2 = jupyter-scilab-kernel-bin
+@JUPYTER_TRUE@am__append_3 = bin/jupyter-scilab-kernel
 
 #
 # using the static system libs might produce linkage issue (eg.
 # std::nothrow for instance) but it seems to be the only acceptable
 # solution for now.
 #
-@USE_STATIC_SYSTEM_LIB_TRUE@am__append_2 = -static-libstdc++ -static-libgcc -static-libgfortran
-@USE_STATIC_SYSTEM_LIB_TRUE@am__append_3 = -static-libstdc++ -static-libgcc -static-libgfortran
+@USE_STATIC_SYSTEM_LIB_TRUE@am__append_4 = -static-libstdc++ -static-libgcc -static-libgfortran
+@USE_STATIC_SYSTEM_LIB_TRUE@am__append_5 = -static-libstdc++ -static-libgcc -static-libgfortran
 # Clang (for example) needs an explicit reference to the lib
-@USE_STATIC_SYSTEM_LIB_FALSE@am__append_4 = -lstdc++ -lgfortran
-@USE_STATIC_SYSTEM_LIB_FALSE@am__append_5 = -lstdc++ -lgfortran
-@IS_MACOSX_TRUE@am__append_6 = -framework Cocoa
-@NEED_JAVA_TRUE@am__append_7 = \
+@USE_STATIC_SYSTEM_LIB_FALSE@am__append_6 = -lstdc++ -lgfortran
+@USE_STATIC_SYSTEM_LIB_FALSE@am__append_7 = -lstdc++ -lgfortran
+@IS_MACOSX_TRUE@am__append_8 = -framework Cocoa
+@NEED_JAVA_TRUE@am__append_9 = \
 @NEED_JAVA_TRUE@			$(top_builddir)/modules/console/libsciconsole.la \
 @NEED_JAVA_TRUE@			$(top_builddir)/modules/jvm/libscijvm.la \
 @NEED_JAVA_TRUE@			$(top_builddir)/modules/commons/libscicommons.la
 
-@NEED_JAVA_FALSE@am__append_8 = \
+@NEED_JAVA_FALSE@am__append_10 = \
 @NEED_JAVA_FALSE@			$(top_builddir)/modules/console/libsciconsole-minimal.la \
 @NEED_JAVA_FALSE@			$(top_builddir)/modules/jvm/libscijvm-disable.la
 
-@MPI_TRUE@am__append_9 = modules/startup/src/c/initMPI.c
-@MPI_TRUE@am__append_10 = $(OPENMPI_CXXFLAGS)
 @MPI_TRUE@am__append_11 = modules/startup/src/c/initMPI.c
 @MPI_TRUE@am__append_12 = $(OPENMPI_CXXFLAGS)
+@MPI_TRUE@am__append_13 = modules/startup/src/c/initMPI.c
+@MPI_TRUE@am__append_14 = $(OPENMPI_CXXFLAGS)
+@JUPYTER_TRUE@am__append_15 = $(top_builddir)/modules/jupyter/libscijupyter.la $(JUPYTER_LIBS)
 
 #  The user wants to compile the localization files
-@GENERATE_LOCALIZATION_FILES_TRUE@am__append_13 = localization
-@COMPILATION_TESTS_TRUE@am__append_14 = check-java
+@GENERATE_LOCALIZATION_FILES_TRUE@am__append_16 = localization
+@COMPILATION_TESTS_TRUE@am__append_17 = check-java
 check_PROGRAMS = call_scilab_c_simple$(EXEEXT) call_scilab_c$(EXEEXT) \
 	call_scilab_c_getlastjob$(EXEEXT) \
 	call_scilab_c_DisableInteractiveMode$(EXEEXT) \
@@ -192,6 +196,7 @@ CONFIG_CLEAN_FILES = scilab.pc etc/modules.xml etc/classpath.xml \
 	modules/core/includes/version.h modules/atoms/etc/repositories \
 	modules/atoms/tests/unit_tests/repositories.orig
 CONFIG_CLEAN_VPATH_FILES =
+@JUPYTER_TRUE@am__EXEEXT_1 = jupyter-scilab-kernel-bin$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(infofilesdir)" "$(DESTDIR)$(pkgconfigdir)" \
 	"$(DESTDIR)$(rootdir)" "$(DESTDIR)$(valgrinddir)"
@@ -263,6 +268,21 @@ call_scilab_readwritestring_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(call_scilab_readwritestring_CFLAGS) $(CFLAGS) \
 	$(call_scilab_readwritestring_LDFLAGS) $(LDFLAGS) -o $@
+am__jupyter_scilab_kernel_bin_SOURCES_DIST =  \
+	modules/startup/src/cpp/jupyter_scilab_kernel.cpp
+@JUPYTER_TRUE@am_jupyter_scilab_kernel_bin_OBJECTS = modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.$(OBJEXT)
+jupyter_scilab_kernel_bin_OBJECTS =  \
+	$(am_jupyter_scilab_kernel_bin_OBJECTS)
+am__DEPENDENCIES_1 =
+am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+@JUPYTER_TRUE@am__DEPENDENCIES_3 = $(top_builddir)/modules/jupyter/libscijupyter.la \
+@JUPYTER_TRUE@	$(am__DEPENDENCIES_1)
+am__DEPENDENCIES_4 = $(am__DEPENDENCIES_2) \
+	$(top_builddir)/modules/libscilab-cli.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_3)
+@JUPYTER_TRUE@jupyter_scilab_kernel_bin_DEPENDENCIES =  \
+@JUPYTER_TRUE@	$(am__DEPENDENCIES_4)
 am__scilab_bin_SOURCES_DIST = modules/startup/src/cpp/scilab.cpp \
 	modules/startup/src/c/initMPI.c
 @MPI_TRUE@am__objects_1 =  \
@@ -271,12 +291,10 @@ am_scilab_bin_OBJECTS =  \
 	modules/startup/src/cpp/scilab_bin-scilab.$(OBJEXT) \
 	$(am__objects_1)
 scilab_bin_OBJECTS = $(am_scilab_bin_OBJECTS)
-am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 scilab_bin_DEPENDENCIES = $(top_builddir)/modules/libscilab.la \
 	$(top_builddir)/modules/libscilab-cli.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_1) $(am__append_7) $(am__append_8) \
+	$(am__DEPENDENCIES_1) $(am__append_9) $(am__append_10) \
 	$(top_builddir)/modules/libscilab.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 scilab_bin_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -291,7 +309,8 @@ am_scilab_cli_bin_OBJECTS =  \
 scilab_cli_bin_OBJECTS = $(am_scilab_cli_bin_OBJECTS)
 scilab_cli_bin_DEPENDENCIES = $(am__DEPENDENCIES_2) \
 	$(top_builddir)/modules/libscilab-cli.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_3)
 scilab_cli_bin_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(AM_CXXFLAGS) $(CXXFLAGS) $(scilab_cli_bin_LDFLAGS) \
@@ -383,7 +402,8 @@ SOURCES = $(call_scilab_c_SOURCES) \
 	$(call_scilab_readwriteboolean_SOURCES) \
 	$(call_scilab_readwritecomplexmatrix_SOURCES) \
 	$(call_scilab_readwritematrix_SOURCES) \
-	$(call_scilab_readwritestring_SOURCES) $(scilab_bin_SOURCES) \
+	$(call_scilab_readwritestring_SOURCES) \
+	$(jupyter_scilab_kernel_bin_SOURCES) $(scilab_bin_SOURCES) \
 	$(scilab_cli_bin_SOURCES)
 DIST_SOURCES = $(call_scilab_c_SOURCES) \
 	$(call_scilab_c_DisableInteractiveMode_SOURCES) \
@@ -393,6 +413,7 @@ DIST_SOURCES = $(call_scilab_c_SOURCES) \
 	$(call_scilab_readwritecomplexmatrix_SOURCES) \
 	$(call_scilab_readwritematrix_SOURCES) \
 	$(call_scilab_readwritestring_SOURCES) \
+	$(am__jupyter_scilab_kernel_bin_SOURCES_DIST) \
 	$(am__scilab_bin_SOURCES_DIST) \
 	$(am__scilab_cli_bin_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
@@ -638,6 +659,7 @@ JOGL2 = @JOGL2@
 JROSETTA_API = @JROSETTA_API@
 JROSETTA_ENGINE = @JROSETTA_ENGINE@
 JUNIT4 = @JUNIT4@
+JUPYTER_LIBS = @JUPYTER_LIBS@
 LAPACK_LIBS = @LAPACK_LIBS@
 LCOV = @LCOV@
 LD = @LD@
@@ -835,11 +857,11 @@ AM_CXXFLAGS = $(SCI_CXXFLAGS)
 AM_FFLAGS = $(SCI_FFLAGS)
 AM_LDFLAGS = $(SCI_LDFLAGS)
 bin_SCRIPTS = bin/scilab bin/scilab-adv-cli bin/scilab-cli \
-	bin/scinotes bin/xcos $(am__append_1)
-scilab_bin_LDFLAGS = $(AM_LDFLAGS) $(OPENMPI_LIBS) $(am__append_2) \
-	$(am__append_4) $(am__append_6)
-scilab_cli_bin_LDFLAGS = $(AM_LDFLAGS) $(OPENMPI_LIBS) $(am__append_3) \
-	$(am__append_5)
+	bin/scinotes bin/xcos $(am__append_1) $(am__append_3)
+scilab_bin_LDFLAGS = $(AM_LDFLAGS) $(OPENMPI_LIBS) $(am__append_4) \
+	$(am__append_6) $(am__append_8)
+scilab_cli_bin_LDFLAGS = $(AM_LDFLAGS) $(OPENMPI_LIBS) $(am__append_5) \
+	$(am__append_7)
 scilab_bin_CPPFLAGS = -I$(top_srcdir)/modules/ast/includes/ast/ \
 	-I$(top_srcdir)/modules/ast/includes/exps/ \
 	-I$(top_srcdir)/modules/ast/includes/operations/ \
@@ -861,7 +883,7 @@ scilab_bin_CPPFLAGS = -I$(top_srcdir)/modules/ast/includes/ast/ \
 	-I$(top_srcdir)/modules/core/src/c/ \
 	-I$(top_srcdir)/modules/dynamic_link/includes/ \
 	-I$(top_srcdir)/modules/startup/src/c/ $(AM_CPPFLAGS) \
-	$(am__append_10)
+	$(am__append_12)
 
 # --no-undefined --relax
 
@@ -872,7 +894,7 @@ scilab_bin_CPPFLAGS = -I$(top_srcdir)/modules/ast/includes/ast/ \
 # link on the final binary
 COMMON_LIBS = $(LTLIBINTL) $(VALGRIND_LIBS)
 scilab_bin_SOURCES = modules/startup/src/cpp/scilab.cpp \
-	$(am__append_9)
+	$(am__append_11)
 
 # the scilab-bin object file itself uses symbols from at least libscilab-cli.la,
 # libsciconsole-minimal.la and libscijvm-disable.la, so we have to link with these
@@ -884,20 +906,25 @@ scilab_bin_SOURCES = modules/startup/src/cpp/scilab.cpp \
 # xerbla function
 scilab_bin_LDADD = $(top_builddir)/modules/libscilab.la \
 	$(top_builddir)/modules/libscilab-cli.la $(OPENMPI_LIBS) \
-	$(XML_LIBS) $(COMMON_LIBS) $(FLIBS) $(am__append_7) \
-	$(am__append_8) $(top_builddir)/modules/libscilab.la \
+	$(XML_LIBS) $(COMMON_LIBS) $(FLIBS) $(am__append_9) \
+	$(am__append_10) $(top_builddir)/modules/libscilab.la \
 	$(BLAS_LIBS) $(LAPACK_LIBS) $(FLIBS)
 
 # Match scilab -nwni (ie command line without graphics)
 scilab_cli_bin_SOURCES = modules/startup/src/cpp/scilab.cpp \
-	$(am__append_11)
+	$(am__append_13)
 scilab_cli_bin_CPPFLAGS = -DWITHOUT_GUI $(scilab_bin_CPPFLAGS) \
-	$(am__append_12)
+	$(am__append_14)
 
 # See the comment about scilab_bin_LDADD (relative to BLAS_LIBS & LAPACK_LIBS)
-scilab_cli_bin_LDADD = $(COMMON_LIBS) $(top_builddir)/modules/libscilab-cli.la $(BLAS_LIBS) $(LAPACK_LIBS) $(FLIBS)
+scilab_cli_bin_LDADD = $(COMMON_LIBS) \
+	$(top_builddir)/modules/libscilab-cli.la $(BLAS_LIBS) \
+	$(LAPACK_LIBS) $(FLIBS) $(am__append_15)
+@JUPYTER_TRUE@jupyter_scilab_kernel_bin_SOURCES = modules/startup/src/cpp/jupyter_scilab_kernel.cpp
+@JUPYTER_TRUE@jupyter_scilab_kernel_bin_CPPFLAGS = $(scilab_cli_bin_CPPFLAGS) -I$(top_srcdir)/modules/jupyter/includes/
+@JUPYTER_TRUE@jupyter_scilab_kernel_bin_LDADD = $(scilab_cli_bin_LDADD)
 LANG_DOMAIN = scilab
-TARGETS_ALL = macros $(am__append_13) $(am__append_14)
+TARGETS_ALL = macros $(am__append_16) $(am__append_17)
 
 # check is performed with scilab, so use the serial-tests on purpose
 TESTS_ENVIRONMENT = LANG=C $(top_builddir)/bin/scilab-cli -nb -noatomsautoload -f
@@ -1184,6 +1211,13 @@ modules/startup/src/cpp/$(am__dirstamp):
 modules/startup/src/cpp/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) modules/startup/src/cpp/$(DEPDIR)
 	@: > modules/startup/src/cpp/$(DEPDIR)/$(am__dirstamp)
+modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.$(OBJEXT):  \
+	modules/startup/src/cpp/$(am__dirstamp) \
+	modules/startup/src/cpp/$(DEPDIR)/$(am__dirstamp)
+
+jupyter-scilab-kernel-bin$(EXEEXT): $(jupyter_scilab_kernel_bin_OBJECTS) $(jupyter_scilab_kernel_bin_DEPENDENCIES) $(EXTRA_jupyter_scilab_kernel_bin_DEPENDENCIES) 
+	@rm -f jupyter-scilab-kernel-bin$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(jupyter_scilab_kernel_bin_OBJECTS) $(jupyter_scilab_kernel_bin_LDADD) $(LIBS)
 modules/startup/src/cpp/scilab_bin-scilab.$(OBJEXT):  \
 	modules/startup/src/cpp/$(am__dirstamp) \
 	modules/startup/src/cpp/$(DEPDIR)/$(am__dirstamp)
@@ -1266,6 +1300,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@modules/call_scilab/examples/call_scilab/c/common/$(DEPDIR)/call_scilab_c_simple-simple_call_scilab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/startup/src/c/$(DEPDIR)/scilab_bin-initMPI.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/startup/src/c/$(DEPDIR)/scilab_cli_bin-initMPI.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@modules/startup/src/cpp/$(DEPDIR)/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/startup/src/cpp/$(DEPDIR)/scilab_bin-scilab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/startup/src/cpp/$(DEPDIR)/scilab_cli_bin-scilab.Po@am__quote@
 
@@ -1456,6 +1491,20 @@ modules/startup/src/c/scilab_cli_bin-initMPI.obj: modules/startup/src/c/initMPI.
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.o: modules/startup/src/cpp/jupyter_scilab_kernel.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(jupyter_scilab_kernel_bin_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.o -MD -MP -MF modules/startup/src/cpp/$(DEPDIR)/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.Tpo -c -o modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.o `test -f 'modules/startup/src/cpp/jupyter_scilab_kernel.cpp' || echo '$(srcdir)/'`modules/startup/src/cpp/jupyter_scilab_kernel.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) modules/startup/src/cpp/$(DEPDIR)/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.Tpo modules/startup/src/cpp/$(DEPDIR)/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='modules/startup/src/cpp/jupyter_scilab_kernel.cpp' object='modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(jupyter_scilab_kernel_bin_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.o `test -f 'modules/startup/src/cpp/jupyter_scilab_kernel.cpp' || echo '$(srcdir)/'`modules/startup/src/cpp/jupyter_scilab_kernel.cpp
+
+modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.obj: modules/startup/src/cpp/jupyter_scilab_kernel.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(jupyter_scilab_kernel_bin_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.obj -MD -MP -MF modules/startup/src/cpp/$(DEPDIR)/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.Tpo -c -o modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.obj `if test -f 'modules/startup/src/cpp/jupyter_scilab_kernel.cpp'; then $(CYGPATH_W) 'modules/startup/src/cpp/jupyter_scilab_kernel.cpp'; else $(CYGPATH_W) '$(srcdir)/modules/startup/src/cpp/jupyter_scilab_kernel.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) modules/startup/src/cpp/$(DEPDIR)/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.Tpo modules/startup/src/cpp/$(DEPDIR)/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='modules/startup/src/cpp/jupyter_scilab_kernel.cpp' object='modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(jupyter_scilab_kernel_bin_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o modules/startup/src/cpp/jupyter_scilab_kernel_bin-jupyter_scilab_kernel.obj `if test -f 'modules/startup/src/cpp/jupyter_scilab_kernel.cpp'; then $(CYGPATH_W) 'modules/startup/src/cpp/jupyter_scilab_kernel.cpp'; else $(CYGPATH_W) '$(srcdir)/modules/startup/src/cpp/jupyter_scilab_kernel.cpp'; fi`
 
 modules/startup/src/cpp/scilab_bin-scilab.o: modules/startup/src/cpp/scilab.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(scilab_bin_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT modules/startup/src/cpp/scilab_bin-scilab.o -MD -MP -MF modules/startup/src/cpp/$(DEPDIR)/scilab_bin-scilab.Tpo -c -o modules/startup/src/cpp/scilab_bin-scilab.o `test -f 'modules/startup/src/cpp/scilab.cpp' || echo '$(srcdir)/'`modules/startup/src/cpp/scilab.cpp

@@ -112,6 +112,10 @@ if MPI
 SUBDIRS += mpi
 endif
 
+if JUPYTER
+SUBDIRS += jupyter
+endif
+
 SUBDIRS += .
 
 # javasci should be compile at the end because it needs libscilab.la
@@ -226,6 +230,10 @@ ENGINE_LIBS_DYNAMIC_LOAD = \
 
 if MPI
 ENGINE_LIBS += $(top_builddir)/modules/mpi/libscimpi.la
+endif
+
+if JUPYTER
+ENGINE_LIBS += $(top_builddir)/modules/jupyter/libscijupyter.la
 endif
 
 # Core modules

@@ -30,6 +30,10 @@ Command line interpreter:
 
 [Further information](http://wiki.scilab.org/howto/install/linux)
 
+[Jupyter](http://jupyter.org/) kernel execution script:
+`./bin/jupyter-scilab-kernel` 
+
+[Further information](https://wiki.scilab.org/GSoC_2016_Leonardo_CONSONI)
 
 OTHER RESOURCES
 ---------------

@@ -69,6 +69,8 @@ Feature changes and additions
 -----------------------------
  
 * Empty strings are used as the default values on String allocation
+* Experimental [Jupyter](http://jupyter.org/) Kernel executable (jupyter-scilab-kernel)
+
 
 Help pages:
 -----------

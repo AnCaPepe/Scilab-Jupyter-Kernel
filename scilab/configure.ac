@@ -158,6 +158,9 @@ AC_ARG_ENABLE(build-giws,
 
 AC_ARG_ENABLE(build-parser,
     AS_HELP_STRING([--enable-build-parser],[Regenerate code for the parser (Lex & YACC)]))
+    
+AC_ARG_ENABLE(jupyter,
+    AS_HELP_STRING([--enable-jupyter],[Build the Scilab Jupyter kernel binary]))
 
 
 ################################################
@@ -1677,6 +1680,20 @@ fi
 AC_SUBST(WITH_TKSCI)
 AM_CONDITIONAL(TCLTK, test "$WITH_TKSCI" = yes)
 
+###########################
+########## Jupyter checks
+###########################
+## Check for dependencies of Jupyter kernel functionality
+
+if test "$enable_jupyter" = yes; then
+    AC_CHECK_LIB([zmq], [zmq_ctx_new], [JUPYTER_LIBS=" -lzmq"], [AC_MSG_ERROR([ZeroMQ not found. Use --disable-jupyter or install ZeroMQ library])])
+    AC_CHECK_LIB([uuid], [uuid_is_null], [JUPYTER_LIBS+=" -luuid"], [AC_MSG_ERROR([uuid not found. Use --disable-jupyter or set the path to uuid library])])
+    
+    AC_SUBST(JUPYTER_LIBS)
+fi
+
+AM_CONDITIONAL(JUPYTER, test "$enable_jupyter" = yes)
+
 #################
 ## MATIO LIBRARY (MAT File I/O Library)
 #################
@@ -2102,6 +2119,7 @@ modules/external_objects/Makefile
 modules/external_objects_java/Makefile
 modules/slint/Makefile
 modules/coverage/Makefile
+modules/jupyter/Makefile
 modules/Makefile
 Makefile
 scilab.pc
@@ -2389,6 +2407,10 @@ echo ""
 echo "HDF5 configuration:"
 echo "  HDF5 CFLAGS ......... = $HDF5_CFLAGS"
 echo "  HDF5 LIBS ........... = $HDF5_LIBS"
+
+echo ""
+echo "Jupyter configuration:"
+echo "  Jupyter LIBS ........... = $JUPYTER_LIBS"
 
 echo ""
 echo "PCRE configuration:"
